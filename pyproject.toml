@@ -1,0 +1,20 @@
+[project]
+name = "jh-loops"
+version = "0.0.1"
+description = "Issue-driven autonomous dev loop: poll GitHub issues and run dev -> verify -> PR via pluggable LLM CLI agents (claude/codex/opencode)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+]
+
+[project.scripts]
+jh-loops = "jh_loops.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jh_loops"]
