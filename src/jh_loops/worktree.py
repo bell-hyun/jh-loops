@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -12,15 +13,41 @@ def branch_name(number: int, title: str) -> str:
     return f"agent/issue-{number}-{slug}"
 
 
-def create(repo_path: str, number: int, title: str) -> tuple[Path, str]:
-    """Create a worktree + branch off the base. Returns (worktree_path, branch)."""
-    raise NotImplementedError  # TODO: git worktree add
+def _git(
+    repo_path: str, *args: str, check: bool = True
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo_path), *args],
+        check=check, capture_output=True, text=True,
+    )
+
+
+def worktrees_dir(repo_path: str) -> Path:
+    """Where worktrees live: a sibling of the repo so they never pollute it."""
+    return Path(repo_path).resolve().parent / ".jh-loops-worktrees"
+
+
+def create(
+    repo_path: str, number: int, title: str, base_branch: str = "main"
+) -> tuple[Path, str]:
+    """Create a worktree + new branch off `base_branch`. Returns (path, branch).
+
+    The orchestrator should `cleanup` defensively before calling this so a stale
+    worktree from a hard crash doesn't block a retry (design §11).
+    """
+    branch = branch_name(number, title)
+    path = worktrees_dir(repo_path) / f"issue-{number}"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _git(repo_path, "worktree", "add", "-b", branch, str(path), base_branch)
+    return path, branch
 
 
 def cleanup(repo_path: str, worktree_path: Path, branch: str) -> None:
     """Remove the worktree AND delete the branch — fully clean (design §6, §11).
 
-    Called on success after the PR push, and on any abnormal exit. Retries start
-    from scratch; no partial work is reused.
+    Idempotent: safe to call when the worktree or branch is already gone (cleanup
+    runs on success and on any abnormal exit). Retries start from scratch.
     """
-    raise NotImplementedError  # TODO: git worktree remove + git branch -D
+    _git(repo_path, "worktree", "remove", "--force", str(worktree_path), check=False)
+    _git(repo_path, "branch", "-D", branch, check=False)
+    _git(repo_path, "worktree", "prune", check=False)
