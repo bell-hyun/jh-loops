@@ -51,3 +51,14 @@ def cleanup(repo_path: str, worktree_path: Path, branch: str) -> None:
     _git(repo_path, "worktree", "remove", "--force", str(worktree_path), check=False)
     _git(repo_path, "branch", "-D", branch, check=False)
     _git(repo_path, "worktree", "prune", check=False)
+
+
+def push(repo_path: str, branch: str) -> None:
+    """Push the work branch to origin (design §10)."""
+    _git(repo_path, "push", "-u", "origin", branch)
+
+
+def commits_ahead(repo_path: str, base_branch: str, branch: str) -> int:
+    """How many commits `branch` is ahead of `base_branch` (0 -> nothing to PR)."""
+    out = _git(repo_path, "rev-list", "--count", f"{base_branch}..{branch}").stdout
+    return int(out.strip() or "0")

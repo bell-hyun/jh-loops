@@ -69,6 +69,37 @@ def test_cleanup_is_idempotent():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def test_commits_ahead_counts_new_commits():
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        repo = tmp / "repo"
+        _init_repo(repo)
+        path, branch = worktree.create(str(repo), 3, "feature")
+        assert worktree.commits_ahead(str(repo), "main", branch) == 0
+        (path / "new.txt").write_text("x\n")
+        _git(path, "add", "-A")
+        _git(path, "commit", "-m", "work")
+        assert worktree.commits_ahead(str(repo), "main", branch) == 1
+        worktree.cleanup(str(repo), path, branch)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_push_builds_git_args():
+    calls = []
+
+    class FakeCompleted:
+        stdout = ""
+
+    original = worktree._git
+    worktree._git = lambda repo, *args, check=True: calls.append((repo, args)) or FakeCompleted()
+    try:
+        worktree.push("/repo", "agent/issue-3-x")
+    finally:
+        worktree._git = original
+    assert calls[0] == ("/repo", ("push", "-u", "origin", "agent/issue-3-x"))
+
+
 if __name__ == "__main__":
     import traceback
 

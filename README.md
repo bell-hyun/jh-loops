@@ -31,8 +31,14 @@
 
 ## 상태
 
-**스캐폴드 단계.** 구조와 시그니처는 설계대로 잡혀 있고, 핵심 로직은 `TODO` /
-`NotImplementedError`로 비어 있다.
+**핵심 로직 구현 + 단위테스트 완료.** issues 파싱, `gh` 래퍼, worktree 생성/정리,
+에이전트 어댑터, orchestrator `tick`/`run`까지 동작하며 35개 테스트가 통과한다.
+테스트: `python3 tests/test_*.py` (단독) 또는 `pytest`.
+
+남은 일:
+- `cli.py`의 `init` 구현 (대상 레포에 라벨 + 이슈 템플릿 설치)
+- 실 레포 + 실 에이전트로 e2e 한 번 돌려보기
+- rich 프레젠테이션 레이어 (현재 orchestrator는 plain `print`)
 
 ## Quickstart (예정)
 
