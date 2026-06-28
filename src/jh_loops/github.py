@@ -40,21 +40,28 @@ def list_open_issues(repo: str) -> list[Issue]:
 
 def is_closed(repo: str, number: int) -> bool:
     """Whether an issue is closed (used to resolve Depends-on, design §5)."""
-    raise NotImplementedError  # TODO
+    data = json.loads(
+        _gh("issue", "view", str(number), "--repo", repo, "--json", "state")
+    )
+    return data.get("state") == "CLOSED"
 
 
 def add_label(repo: str, number: int, label: str) -> None:
-    raise NotImplementedError  # TODO
+    _gh("issue", "edit", str(number), "--repo", repo, "--add-label", label)
 
 
 def remove_label(repo: str, number: int, label: str) -> None:
-    raise NotImplementedError  # TODO
+    _gh("issue", "edit", str(number), "--repo", repo, "--remove-label", label)
 
 
 def comment(repo: str, number: int, body: str) -> None:
-    raise NotImplementedError  # TODO
+    _gh("issue", "comment", str(number), "--repo", repo, "--body", body)
 
 
 def create_pr(repo: str, head: str, base: str, title: str, body: str) -> str:
     """Open a PR (no auto-merge, design §10). Returns the PR URL."""
-    raise NotImplementedError  # TODO
+    return _gh(
+        "pr", "create", "--repo", repo,
+        "--head", head, "--base", base,
+        "--title", title, "--body", body,
+    ).strip()
