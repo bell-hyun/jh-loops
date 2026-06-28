@@ -9,10 +9,12 @@
 
 ## 아키텍처 (3층)
 
-1. **컨벤션** (`conventions/`, `.claude/skills/`) — 대상 레포에 설치하는 이슈
-   템플릿 + 라벨 세트, 그리고 계약에 맞는 이슈를 작성하게 돕는 Claude Code 스킬
-   (`jh-loops-issue`). 스킬은 `.claude/skills/jh-loops-issue/`를 대상 레포의
-   `.claude/skills/` 또는 `~/.claude/skills/`로 복사해 쓴다.
+1. **컨벤션** (`conventions/`, `skills/`) — 대상 레포에 설치하는 이슈 템플릿 +
+   라벨 세트, 그리고 계약에 맞는 이슈를 작성하게 돕는 Claude Code 스킬
+   (`jh-loops-issue`). 스킬의 canonical 위치는 `skills/jh-loops-issue/`이고,
+   이 레포에서는 `.claude/skills/jh-loops-issue`가 그쪽으로 심볼릭 링크돼 바로
+   쓰인다. 다른 레포에서 쓰려면 `skills/jh-loops-issue/`를 그 레포의
+   `.claude/skills/` 또는 `~/.claude/skills/`로 복사한다.
 2. **오케스트레이터** (`src/jh_loops/`) — 결정론 스크립트(폴링·선정·claim·worktree·
    PR). 대상 레포에 무관.
 3. **에이전트 어댑터** (`src/jh_loops/agents/`) — 3개 CLI 명령 템플릿 +
