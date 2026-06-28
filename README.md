@@ -9,7 +9,10 @@
 
 ## 아키텍처 (3층)
 
-1. **컨벤션** (`conventions/`) — 대상 레포에 설치하는 이슈 템플릿 + 라벨 세트.
+1. **컨벤션** (`conventions/`, `.claude/skills/`) — 대상 레포에 설치하는 이슈
+   템플릿 + 라벨 세트, 그리고 계약에 맞는 이슈를 작성하게 돕는 Claude Code 스킬
+   (`jh-loops-issue`). 스킬은 `.claude/skills/jh-loops-issue/`를 대상 레포의
+   `.claude/skills/` 또는 `~/.claude/skills/`로 복사해 쓴다.
 2. **오케스트레이터** (`src/jh_loops/`) — 결정론 스크립트(폴링·선정·claim·worktree·
    PR). 대상 레포에 무관.
 3. **에이전트 어댑터** (`src/jh_loops/agents/`) — 3개 CLI 명령 템플릿 +
@@ -40,15 +43,18 @@
 - 실 레포 + 실 에이전트로 e2e 한 번 돌려보기
 - rich 프레젠테이션 레이어 (현재 orchestrator는 plain `print`)
 
-## Quickstart (예정)
+## Quickstart
 
 ```bash
-# 대상 레포에 컨벤션(라벨 + 이슈 템플릿) 설치
+# 1) 대상 레포에 라벨 세트 설치 (이슈 템플릿/스킬은 안내대로 복사)
 jh-loops init owner/repo
 
-# 한 틱만 (이슈 하나 처리)
+# 2) 계약에 맞는 이슈 작성 — Claude Code에서 스킬 사용
+/jh-loops-issue
+
+# 3) 한 틱만 (이슈 하나 처리)
 jh-loops tick owner/repo --agent claude
 
-# 루프 (single-flight는 cron + flock로 외부에서 보장)
+# 4) 루프 (single-flight는 cron + flock로 외부에서 보장)
 jh-loops run owner/repo --agent claude --interval 10m
 ```
