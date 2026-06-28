@@ -19,8 +19,8 @@ def is_actionable(issue: Issue, repo: str) -> bool:
     if any(lbl in SKIP_LABELS for lbl in issue.labels):
         return False
     parsed = issues.parse(issue)
-    if not parsed.has_ac_section:
-        return False
+    if not parsed.has_ac_section or not parsed.acceptance_criteria:
+        return False  # missing or empty AC -> needs-spec, not actionable
     return all(github.is_closed(repo, dep) for dep in parsed.depends_on)
 
 
