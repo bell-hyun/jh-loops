@@ -5,7 +5,7 @@ from __future__ import annotations
 import typer
 from rich.console import Console
 
-from . import orchestrator
+from . import github, labels, orchestrator
 from .config import Config
 
 app = typer.Typer(
@@ -18,9 +18,14 @@ console = Console()
 
 @app.command()
 def init(repo: str = typer.Argument(..., help="owner/name")) -> None:
-    """Install conventions (labels + issue template) into a target repo."""
-    console.print(f"[bold]init[/] {repo} — TODO: run conventions/labels.sh + copy issue template")
-    raise typer.Exit(code=1)
+    """Create the jh-loops label set in a target repo (design §6)."""
+    for label, color, description in labels.LABEL_SPECS:
+        github.create_label(repo, label.value, color, description)
+        console.print(f"[green]✓[/] label {label.value}")
+    console.print(
+        "\nNext: copy [bold]conventions/ISSUE_TEMPLATE/feature.md[/] into the repo's "
+        "[bold].github/ISSUE_TEMPLATE/[/] and commit it."
+    )
 
 
 @app.command()

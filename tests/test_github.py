@@ -52,6 +52,16 @@ def test_is_closed_false_when_open():
         assert github.is_closed("o/r", 5) is False
 
 
+def test_create_label():
+    fake = recorder()
+    with patch_gh(fake):
+        github.create_label("o/r", "agent", "1f6feb", "opt-in")
+    assert fake.calls[0] == (
+        "label", "create", "agent", "--repo", "o/r",
+        "--color", "1f6feb", "--description", "opt-in", "--force",
+    )
+
+
 def test_add_label():
     fake = recorder()
     with patch_gh(fake):

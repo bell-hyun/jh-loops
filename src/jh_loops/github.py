@@ -46,6 +46,14 @@ def is_closed(repo: str, number: int) -> bool:
     return data.get("state") == "CLOSED"
 
 
+def create_label(repo: str, name: str, color: str, description: str) -> None:
+    """Create (or update, via --force) a label in a target repo (design §6)."""
+    _gh(
+        "label", "create", name, "--repo", repo,
+        "--color", color, "--description", description, "--force",
+    )
+
+
 def add_label(repo: str, number: int, label: str) -> None:
     _gh("issue", "edit", str(number), "--repo", repo, "--add-label", label)
 
